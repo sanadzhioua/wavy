@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collection Homme - Élégance</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts: Inter & Playfair Display -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* Mêmes styles que les autres pages pour la cohérence */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F7F4;
+        }
+        h1, h2, h3, .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+        .product-image-container, .category-card {
+            overflow: hidden;
+        }
+        .product-image-container img, .category-card img {
+            transition: transform 0.5s ease;
+        }
+        .product-image-container:hover img, .category-card:hover img {
+            transform: scale(1.05);
+        }
+        /* Styles pour le panier */
+        #cart-panel {
+            transition: transform 0.3s ease-in-out;
+        }
+        #cart-overlay {
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        /* NOUVELLES ANIMATIONS */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0; /* Assure que l'élément est invisible avant l'animation */
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- =========== En-tête et Navigation =========== -->
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-2xl font-serif font-bold text-gray-900">Élégance</a>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="nouveaute.html" class="text-gray-600 hover:text-gray-900 transition">Nouveautés</a>
+                <a href="femme.html" class="text-gray-600 hover:text-gray-900 transition">Femme</a>
+                <a href="homme.html" class="text-gray-900 font-semibold border-b-2 border-gray-800">Homme</a>
+                <a href="index.html#promotions" class="text-red-500 font-bold hover:text-red-600 transition">Promotions</a>
+                <a href="index.html#contact-us" class="text-gray-600 hover:text-gray-900 transition">Contact</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button aria-label="Rechercher"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg></button>
+                <button id="cart-button" aria-label="Panier" class="relative">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                    <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </button>
+                <button id="mobile-menu-button" class="md:hidden" aria-label="Menu"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg></button>
+            </div>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4 space-y-2">
+             <a href="nouveaute.html" class="block text-gray-600 hover:text-gray-900 transition">Nouveautés</a>
+             <a href="femme.html" class="block text-gray-600 hover:text-gray-900 transition">Femme</a>
+             <a href="homme.html" class="block text-gray-900 font-semibold">Homme</a>
+             <a href="index.html#promotions" class="block text-red-500 font-bold hover:text-red-600 transition">Promotions</a>
+             <a href="index.html#contact-us" class="block text-gray-600 hover:text-gray-900 transition">Contact</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- =========== Section Héros Homme (MODIFIÉE) =========== -->
+        <section class="relative h-[80vh] bg-cover bg-center text-white" style="background-image: url('https://media.istockphoto.com/id/1177831786/fr/photo/type-moderne-prenant-une-promenade-sur-la-plage.jpg?s=612x612&w=0&k=20&c=zYE33cIQ9zirSs94NhmwXmLZvk2AnrxZ6TowhjJJuT8=');">
+            <div class="absolute inset-0 bg-black/25"></div>
+            <div class="relative h-full flex flex-col justify-center items-center text-center px-4">
+                <h1 class="text-4xl md:text-6xl font-serif font-bold">L'Élégance au Masculin</h1>
+                <p class="text-lg md:text-xl max-w-2xl mt-4">Un style intemporel et moderne pour chaque occasion.</p>
+            </div>
+        </section>
+
+        <div class="container mx-auto px-6 py-16 md:py-24">
+            <!-- Vue de sélection des catégories -->
+            <div id="category-selection-view">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-serif">Nos Catégories</h2>
+                    <p class="text-gray-600 mt-2">Explorez nos différentes collections pour trouver votre style.</p>
+                </div>
+                <div id="category-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Les catégories seront injectées ici -->
+                </div>
+            </div>
+
+            <!-- Vue d'affichage des produits (initialement cachée) -->
+            <div id="product-display-view" class="hidden">
+                <div class="flex items-center mb-12">
+                    <button id="back-to-categories-btn" class="text-gray-600 hover:text-gray-900 mr-4 p-2 rounded-full hover:bg-gray-200 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                    </button>
+                    <h2 id="product-view-title" class="text-3xl md:text-4xl font-serif"></h2>
+                </div>
+                <div id="men-product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-12">
+                    <!-- Les produits filtrés seront injectés ici -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- =========== Panier (Off-canvas) =========== -->
+    <div id="cart-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden"></div>
+    <div id="cart-panel" class="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-xl z-50 transform translate-x-full">
+        <div class="flex flex-col h-full">
+            <div class="flex justify-between items-center p-6 border-b">
+                <h2 class="text-2xl font-serif">Votre Panier</h2>
+                <button id="close-cart-button" class="text-2xl font-bold hover:text-red-500 transition-colors">&times;</button>
+            </div>
+            <div id="cart-items" class="flex-grow p-6 overflow-y-auto">
+                <p class="text-gray-500">Votre panier est vide.</p>
+            </div>
+            <div class="p-6 border-t bg-gray-50">
+                <div class="space-y-2 mb-4 text-gray-700">
+                    <div class="flex justify-between">
+                        <span>Sous-total (HT)</span>
+                        <span id="cart-subtotal">0,00 €</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>TVA (19%)</span>
+                        <span id="cart-tax">0,00 €</span>
+                    </div>
+                    <div class="flex justify-between font-bold text-lg text-gray-900">
+                        <span>Total (TTC)</span>
+                        <span id="cart-total">0,00 €</span>
+                    </div>
+                </div>
+                <a href="caisse.html" id="checkout-button" class="block text-center w-full bg-gray-800 text-white py-3 rounded-md hover:bg-gray-900 transition">Passer la commande</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========== Pied de page (Identique à l'accueil) =========== -->
+    <footer id="contact" class="bg-gray-900 text-white pt-16 pb-8">
+         <div class="container mx-auto px-6">
+            <p class="text-center text-gray-500">&copy; <span id="year"></span> Élégance. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- Base de données étendue des Produits Homme ---
+            const menProducts = [];
+            const categories = [
+                { id: 'shirt', label: 'Chemises', image: 'https://i.pinimg.com/736x/e9/f7/c2/e9f7c2ca014a77ebb3e91f027bbe433b.jpg' },
+                { id: 't-shirt', label: 'T-shirts & Sweats', image: 'https://i.pinimg.com/736x/86/26/55/862655a50a0e212797317a5a489836d4.jpg' },
+                { id: 'polo', label: 'Polos', image: 'https://i.pinimg.com/736x/e0/54/1b/e0541be7540338544d7ba540d4498a00.jpg' },
+                { id: 'jean', label: 'Jeans & Pantalons', image: 'https://i.pinimg.com/736x/4b/4a/38/4b4a3883ccd5223b33ef5204307015cb.jpg' },
+                { id: 'shoes', label: 'Chaussures', image: 'https://i.pinimg.com/736x/58/a6/b8/58a6b8cd089acb86c652348a4ad09f39.jpg' }
+            ];
+
+            let productIdCounter = 100; // Start IDs high to avoid conflicts
+            categories.forEach(cat => {
+                for (let i = 1; i <= 20; i++) {
+                    menProducts.push({
+                        id: productIdCounter++,
+                        name: `${cat.label.slice(0, -1)} #${i}`,
+                        price: Math.floor(Math.random() * (200 - 40 + 1)) + 40,
+                        image: `https://placehold.co/600x800/eeeeee/333333?text=${encodeURIComponent(cat.label.split(' ')[0])}+${i}`,
+                        category: cat.id,
+                        categoryLabel: cat.label
+                    });
+                }
+            });
+
+            const categorySelectionView = document.getElementById('category-selection-view');
+            const productDisplayView = document.getElementById('product-display-view');
+            const categoryGrid = document.getElementById('category-grid');
+            const productGrid = document.getElementById('men-product-grid');
+            const productViewTitle = document.getElementById('product-view-title');
+            const backToCategoriesBtn = document.getElementById('back-to-categories-btn');
+
+            // --- Fonction pour afficher les produits ---
+            function renderProducts(productsToRender) {
+                productGrid.innerHTML = '';
+                productsToRender.forEach((product, index) => {
+                    const productLink = document.createElement('a');
+                    productLink.href = `produit.html?id=${product.id}`;
+                    productLink.className = 'text-left group animate-fade-in-up';
+                    productLink.style.animationDelay = `${index * 50}ms`; // Animation décalée
+
+                    productLink.innerHTML = `
+                        <div class="product-image-container rounded-lg shadow-md mb-4 bg-gray-200">
+                            <img src="${product.image}" alt="${product.name}" class="w-full h-auto object-cover rounded-lg">
+                        </div>
+                        <h3 class="font-semibold text-lg">${product.name}</h3>
+                        <p class="text-gray-500">${product.price.toFixed(2)} €</p>
+                    `;
+                    productGrid.appendChild(productLink);
+                });
+            }
+
+            // --- Fonction pour afficher les catégories ---
+            function renderCategories() {
+                categoryGrid.innerHTML = '';
+                categories.forEach(cat => {
+                    const categoryCard = document.createElement('div');
+                    categoryCard.className = 'category-card relative rounded-lg shadow-lg cursor-pointer h-64 animate-fade-in-up';
+                    categoryCard.dataset.category = cat.id;
+                    categoryCard.dataset.label = cat.label;
+
+                    categoryCard.innerHTML = `
+                        <img src="${cat.image}" alt="${cat.label}" class="w-full h-full object-cover rounded-lg">
+                        <div class="absolute inset-0 bg-black/40 rounded-lg"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <h2 class="text-white text-4xl font-serif font-bold text-center px-4">${cat.label}</h2>
+                        </div>
+                    `;
+                    categoryGrid.appendChild(categoryCard);
+                });
+            }
+
+            // --- Logique de navigation entre vues ---
+            function showProductView(category, label) {
+                const filteredProducts = menProducts.filter(p => p.category === category);
+                renderProducts(filteredProducts);
+                productViewTitle.textContent = label;
+
+                categorySelectionView.classList.add('hidden');
+                productDisplayView.classList.remove('hidden');
+                window.scrollTo(0, 0);
+            }
+
+            function showCategoryView() {
+                productDisplayView.classList.add('hidden');
+                categorySelectionView.classList.remove('hidden');
+            }
+
+            // --- Écouteurs d'événements ---
+            categoryGrid.addEventListener('click', function(e) {
+                const card = e.target.closest('.category-card');
+                if (card) {
+                    const category = card.dataset.category;
+                    const label = card.dataset.label;
+                    showProductView(category, label);
+                }
+            });
+
+            backToCategoriesBtn.addEventListener('click', showCategoryView);
+
+            // --- Affichage initial ---
+            renderCategories();
+
+            // --- Logique du menu mobile ---
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // --- Logique du Panier (partagée) ---
+            const cartPanel = document.getElementById('cart-panel');
+            const cartOverlay = document.getElementById('cart-overlay');
+            const cartButton = document.getElementById('cart-button');
+            const closeCartButton = document.getElementById('close-cart-button');
+            const cartItemsContainer = document.getElementById('cart-items');
+            const cartCountElement = document.getElementById('cart-count');
+            const cartSubtotalElement = document.getElementById('cart-subtotal');
+            const cartTaxElement = document.getElementById('cart-tax');
+            const cartTotalElement = document.getElementById('cart-total');
+            const checkoutButton = document.getElementById('checkout-button');
+            const TVA_RATE = 0.19;
+
+            const toggleCart = () => {
+                cartPanel.classList.toggle('translate-x-full');
+                cartOverlay.classList.toggle('hidden');
+            };
+
+            cartButton.addEventListener('click', () => {
+                renderCart();
+                toggleCart();
+            });
+            if(closeCartButton) {
+                closeCartButton.addEventListener('click', toggleCart);
+            }
+            if(cartOverlay) {
+                cartOverlay.addEventListener('click', toggleCart);
+            }
+
+            function getCart() { return JSON.parse(localStorage.getItem('cart')) || []; }
+            function saveCart(cart) {
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartIcon();
+            }
+            function updateCartIcon() {
+                const totalItems = getCart().reduce((sum, item) => sum + item.quantity, 0);
+                if (cartCountElement) {
+                    cartCountElement.textContent = totalItems;
+                }
+                if (checkoutButton) {
+                    if (totalItems === 0) {
+                        checkoutButton.classList.add('opacity-50', 'cursor-not-allowed');
+                        checkoutButton.href = '#';
+                    } else {
+                        checkoutButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                        checkoutButton.href = 'caisse.html';
+                    }
+                }
+            }
+            function renderCart() {
+                const cart = getCart();
+                if (!cartItemsContainer) return;
+                cartItemsContainer.innerHTML = '';
+                let subtotal = 0;
+
+                if (cart.length === 0) {
+                    cartItemsContainer.innerHTML = '<p class="text-gray-500">Votre panier est vide.</p>';
+                } else {
+                    cart.forEach((item, index) => {
+                        const itemElement = document.createElement('div');
+                        itemElement.className = 'flex items-center gap-4 py-4 border-b';
+                        itemElement.innerHTML = `
+                            <img src="${item.image}" alt="${item.name}" class="w-20 h-24 object-cover rounded-md">
+                            <div class="flex-grow">
+                                <h4 class="font-semibold">${item.name}</h4>
+                                <p class="text-sm text-gray-500">Taille: ${item.size}</p>
+                                <p class="text-lg font-semibold">${(item.price * item.quantity).toFixed(2)} €</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="font-semibold">x ${item.quantity}</p>
+                                <button class="text-xs text-gray-500 hover:text-red-500 transition cart-item-remove-btn" data-index="${index}">Supprimer</button>
+                            </div>
+                        `;
+                        cartItemsContainer.appendChild(itemElement);
+                        subtotal += item.price * item.quantity;
+                    });
+                }
+
+                const tax = subtotal * TVA_RATE;
+                const total = subtotal + tax;
+
+                if(cartSubtotalElement) cartSubtotalElement.textContent = `${subtotal.toFixed(2)} €`;
+                if(cartTaxElement) cartTaxElement.textContent = `${tax.toFixed(2)} €`;
+                if(cartTotalElement) cartTotalElement.textContent = `${total.toFixed(2)} €`;
+
+                document.querySelectorAll('.cart-item-remove-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const indexToRemove = parseInt(e.target.dataset.index);
+                        let cart = getCart();
+                        cart.splice(indexToRemove, 1);
+                        saveCart(cart);
+                        renderCart();
+                    });
+                });
+                updateCartIcon();
+            }
+            updateCartIcon();
+
+            // Mise à jour de l'année dans le pied de page
+            const yearSpan = document.getElementById('year');
+            if(yearSpan) {
+                yearSpan.textContent = new Date().getFullYear();
+            }
+        });
+    </script>
+</body>
+</html>

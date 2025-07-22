@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wavy - La Mode Prestigieuse</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+    <style>
+        /* Définition des polices personnalisées */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFDFB; /* Un fond blanc cassé très subtil */
+            color: #1a202c;
+        }
+        h1, h2, h3, .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Animations subtiles */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Classe utilitaire pour les animations au défilement */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.165, 0.84, 0.44, 1), transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Style pour le survol des images */
+        .img-hover-zoom {
+            transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        .group:hover .img-hover-zoom {
+            transform: scale(1.05);
+        }
+
+        /* Style pour les boutons */
+        .btn {
+            @apply inline-block px-8 py-3 text-center font-semibold transition duration-300 rounded-md shadow-sm;
+        }
+        .btn-primary {
+            @apply bg-gray-900 text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900;
+        }
+        .btn-secondary {
+            @apply bg-transparent text-gray-900 border border-gray-900 hover:bg-gray-900 hover:text-white;
+        }
+
+        /* Chatbot Styles */
+        #chatbot-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+        }
+        #chatbot-button {
+            background-color: #1a202c;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        #chatbot-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        #chatbot-window {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 350px;
+            height: 500px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform: translateY(20px) scale(0.95);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        #chatbot-window.open {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #chatbot-header {
+            background-color: #1a202c;
+            color: white;
+            padding: 1rem;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #chatbot-messages {
+            flex-grow: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .chat-message {
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            max-width: 80%;
+            line-height: 1.5;
+        }
+        .user-message {
+            background-color: #f0f0f0;
+            align-self: flex-end;
+            color: #1a202c;
+        }
+        .bot-message {
+            background-color: #1a202c;
+            color: white;
+            align-self: flex-start;
+        }
+         .bot-message.typing {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+        }
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #a0aec0; /* Lighter gray for dots */
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: typing-bounce 1.2s infinite ease-in-out;
+        }
+        .typing-dot:nth-child(2) {
+            animation-delay: -1.0s;
+        }
+        .typing-dot:nth-child(3) {
+            animation-delay: -0.8s;
+        }
+        @keyframes typing-bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1.0); }
+        }
+        #chatbot-input-container {
+            border-top: 1px solid #e2e8f0;
+            padding: 1rem;
+            display: flex;
+        }
+        #chatbot-input {
+            flex-grow: 1;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            padding: 0.75rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        #chatbot-input:focus {
+            border-color: #1a202c;
+        }
+        #chatbot-send {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            margin-left: 0.5rem;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="acceuil.html" class="text-3xl font-serif font-bold text-gray-900">Wavy</a>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="nouveaute.html" class="text-gray-600 hover:text-gray-900 transition-colors duration-300">Nouveautés</a>
+                <a href="femme.html" class="text-gray-600 hover:text-gray-900 transition-colors duration-300">Femme</a>
+                <a href="homme.html" class="text-gray-600 hover:text-gray-900 transition-colors duration-300">Homme</a>
+                <a href="promotions.html" class="text-red-500 font-bold hover:text-red-600 transition-colors duration-300">Promotions</a>
+                <a href="#contact-us" class="text-gray-600 hover:text-gray-900 transition-colors duration-300">Contact</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button aria-label="Rechercher" class="text-gray-600 hover:text-gray-900 transition-colors duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                </button>
+                <button aria-label="Panier" class="text-gray-600 hover:text-gray-900 transition-colors duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                </button>
+                <button id="mobile-menu-button" class="md:hidden text-gray-600 hover:text-gray-900" aria-label="Menu">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
+                </button>
+            </div>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4 space-y-2">
+            <a href="nouveaute.html" class="block text-gray-600 hover:text-gray-900 transition">Nouveautés</a>
+            <a href="femme.html" class="block text-gray-600 hover:text-gray-900 transition">Femme</a>
+            <a href="homme.html" class="block text-gray-600 hover:text-gray-900 transition">Homme</a>
+            <a href="promotions.html" class="block text-red-500 font-bold hover:text-red-600 transition">Promotions</a>
+            <a href="#contact-us" class="block text-gray-600 hover:text-gray-900 transition">Contact</a>
+        </div>
+    </header>
+
+    <main>
+        <section class="relative h-[85vh] bg-cover bg-center text-white overflow-hidden" style="background-image: url('https://images.unsplash.com/photo-1509319117193-57bab727e09d?q=80&w=1887&auto=format&fit=crop');">
+            <div class="absolute inset-0 bg-black/50"></div>
+            <div class="relative h-full flex flex-col justify-center items-center text-center px-4">
+                <h1 class="text-5xl md:text-7xl lg:text-8xl font-serif font-extrabold mb-4" style="animation: fadeInUp 1s ease-out;">L'Élégance Redéfinie</h1>
+                <p class="text-lg md:text-xl max-w-2xl mb-8" style="animation: fadeInUp 1s ease-out 0.2s; animation-fill-mode: backwards;">Des pièces uniques pour un style qui vous ressemble.</p>
+                <div style="animation: fadeInUp 1s ease-out 0.4s; animation-fill-mode: backwards;">
+                  <a href="nouveaute.html" class="btn btn-primary bg-white text-gray-900 hover:bg-gray-200">Découvrir la collection</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="nouveautes" class="py-20 md:py-28">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16 reveal">
+                    <h2 class="text-4xl md:text-5xl font-serif">Nouveautés</h2>
+                    <p class="text-gray-600 mt-3 text-lg">Les dernières tendances, fraîchement arrivées.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                    <div class="text-left group reveal">
+                        <div class="rounded-lg shadow-lg mb-4 overflow-hidden aspect-[4/5] bg-gray-200">
+                            <img src="https://assets.armani.com/image/upload/f_auto,q_auto:best,ar_4:5,w_1350,c_fill/8NZG43_ZNUAZ_1200_D_FW2024.jpg" alt="Veste en Cachemire" class="w-full h-full object-cover img-hover-zoom">
+                        </div>
+                        <h3 class="font-semibold text-lg">Veste en Cachemire</h3>
+                        <p class="text-gray-500">489,00 €</p>
+                    </div>
+                     <div class="text-left group reveal" style="transition-delay: 150ms">
+                        <div class="rounded-lg shadow-lg mb-4 overflow-hidden aspect-[4/5] bg-gray-200">
+                            <img src="https://robe-vert-emeraude.com/wp-content/uploads/2024/05/robe-de-soiree-vert-emeraude-3.jpg" alt="Robe de Soirée Émeraude" class="w-full h-full object-cover img-hover-zoom">
+                        </div>
+                        <h3 class="font-semibold text-lg">Robe de Soirée Émeraude</h3>
+                        <p class="text-gray-500">249,00 €</p>
+                    </div>
+                     <div class="text-left group reveal" style="transition-delay: 300ms">
+                        <div class="rounded-lg shadow-lg mb-4 overflow-hidden aspect-[4/5] bg-gray-200">
+                            <img src="https://image.made-in-china.com/365f3j00YoeCMgiRCvbV/Chaussures-en-cuir-italien-pour-hommes-mocassins-plats-la-mode.webp" alt="Mocassins en Cuir Italien" class="w-full h-full object-cover img-hover-zoom">
+                        </div>
+                        <h3 class="font-semibold text-lg">Mocassins en Cuir Italien</h3>
+                        <p class="text-gray-500">165,00 €</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="categories" class="py-20 md:py-28 bg-gray-50">
+            <div class="container mx-auto px-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <a href="femme.html" class="relative group block rounded-lg overflow-hidden shadow-2xl h-96 reveal">
+                        <img src="https://images.unsplash.com/photo-1581338834647-b0fb40704e21?q=80&w=1887&auto=format&fit=crop" alt="Catégorie femme" class="w-full h-full object-cover img-hover-zoom">
+                        <div class="absolute inset-0 bg-black/40 transition-opacity duration-300 group-hover:bg-black/20"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <h2 class="text-white text-5xl font-serif font-bold tracking-wider">Femme</h2>
+                        </div>
+                    </a>
+                    <a href="homme.html" class="relative group block rounded-lg overflow-hidden shadow-2xl h-96 reveal" style="transition-delay: 200ms">
+                        <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1887&auto=format&fit=crop" alt="Catégorie homme" class="w-full h-full object-cover img-hover-zoom">
+                        <div class="absolute inset-0 bg-black/40 transition-opacity duration-300 group-hover:bg-black/20"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <h2 class="text-white text-5xl font-serif font-bold tracking-wider">Homme</h2>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="femme-section" class="py-20 md:py-28">
+            <div class="container mx-auto px-6 text-center">
+                <div class="mb-16 reveal">
+                    <h2 class="text-4xl md:text-5xl font-serif mb-2">Pour Elle</h2>
+                    <p class="text-gray-600 mt-3 text-lg">Les essentiels de la garde-robe féminine.</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+                    <div class="text-left group reveal">
+                        <div class="rounded-lg shadow-lg mb-4 overflow-hidden aspect-[3/4] bg-gray-200">
+                            <img src="https://i.pinimg.com/736x/c9/30/7e/c9307e72976ae49d8796b74bad5497e8.jpg" alt="Robe florale" class="w-full h-full object-cover img-hover-zoom">
+                        </div>
+                        <h3 class="font-semibold text-lg">Robe Florale</h3>
+                        <p class="text-gray-500">129,00 €</p>
+                    </div>
+                     <div class="text-left group reveal" style="transition-delay: 150ms;">
+                        <div class="rounded-lg shadow-lg mb-4 overflow-hidden aspect-[3/4] bg-gray-200">
+                            <img src="https://i.pinimg.com/736x/d9/50/02/d9500245c5c14a057c6853cfe4beba46.jpg" alt="Pantalon large" class="w-full h-full object-cover img-hover-zoom">
+                        </div>
+                        <h3 class="font-semibold text-lg">Pantalon Large en Lin</h3>
+                        <p class="text-gray-500">89,00 €</p>
+                    </div>
+                     <div class="text-left group reveal" style="transition-delay: 300ms;">
+                        <div class="rounded-lg shadow-lg mb-4 overflow-hidden aspect-[3/4] bg-gray-200">
+                            <img src="https://i.pinimg.com/736x/04/25/ef/0425efe5a9662e7798b5342a5677d435.jpg" alt="Top élégant" class="w-full h-full object-cover img-hover-zoom">
+                        </div>
+                        <h3 class="font-semibold text-lg">Top Élégant à Volants</h3>
+                        <p class="text-gray-500">65,00 €</p>
+                    </div>
+                     <div class="text-left group reveal" style="transition-delay: 450ms;">
+                        <div class="rounded-lg shadow-lg mb-4 overflow-hidden aspect-[3/4] bg-gray-200">
+                            <img src="https://i.pinimg.com/736x/8d/5d/50/8d5d50fb0f3460bdea08818ab31cfc6f.jpg" alt="Sandales en cuir" class="w-full h-full object-cover img-hover-zoom">
+                        </div>
+                        <h3 class="font-semibold text-lg">Sandales en Cuir</h3>
+                        <p class="text-gray-500">110,00 €</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+         <section id="homme-section" class="py-20 md:py-28 bg-gray-50">
+            <div class="container mx-auto px-6 text-center">
+                <div class="mb-16 reveal">
+                    <h2 class="text-4xl md:text-5xl font-serif mb-2">Pour Lui</h2>
+                    <p class="text-gray-600 mt-3 text-lg">Un style intemporel et moderne.</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+                    <div class="text-left group reveal">
+                        <div class="rounded-lg shadow-lg mb-4 overflow-hidden aspect-[3/4] bg-gray-200">
+                            <img src="https://i.pinimg.com/736x/e9/f7/c2/e9f7c2ca014a77ebb3e91f027bbe433b.jpg" alt="Chemise en lin" class="w-full h-full object-cover img-hover-zoom">
+                        </div>
+                        <h3 class="font-semibold text-lg">Chemise en Lin</h3>
+                        <p class="text-gray-500">95,00 €</p>
+                    </div>
+                    <div class="text-left group reveal" style="transition-delay: 150ms;">
+                        <div class="rounded-lg shadow-lg mb-4 overflow-hidden aspect-[3/4] bg-gray-200">
+                            <img src="https://i.pinimg.com/736x/86/26/55/862655a50a0e212797317a5a489836d4.jpg" alt="Sweat en coton" class="w-full h-full object-cover img-hover-zoom">
+                        </div>
+                        <h3 class="font-semibold text-lg">Sweat en Coton Bio</h3>
+                        <p class="text-gray-500">79,00 €</p>
+                    </div>
+                    <div class="text-left group reveal" style="transition-delay: 300ms;">
+                        <div class="rounded-lg shadow-lg mb-4 overflow-hidden aspect-[3/4] bg-gray-200">
+                            <img src="https://i.pinimg.com/736x/96/fc/a0/96fca08feb86a1823cdfb182a9d11a59.jpg" alt="T-shirt à poche" class="w-full h-full object-cover img-hover-zoom">
+                        </div>
+                        <h3 class="font-semibold text-lg">T-shirt à Poche</h3>
+                        <p class="text-gray-500">45,00 €</p>
+                    </div>
+                    <div class="text-left group reveal" style="transition-delay: 450ms;">
+                        <div class="rounded-lg shadow-lg mb-4 overflow-hidden aspect-[3/4] bg-gray-200">
+                            <img src="https://i.pinimg.com/736x/4b/4a/38/4b4a3883ccd5223b33ef5204307015cb.jpg" alt="Pantalon chino" class="w-full h-full object-cover img-hover-zoom">
+                        </div>
+                        <h3 class="font-semibold text-lg">Pantalon Chino</h3>
+                        <p class="text-gray-500">105,00 €</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="promotions" class="py-20 md:py-28">
+            <div class="container mx-auto px-6">
+                <div class="bg-red-50 rounded-lg shadow-xl p-8 md:p-16 flex flex-col lg:flex-row items-center gap-12 reveal">
+                    <div class="lg:w-1/2 text-center lg:text-left">
+                        <h2 class="text-3xl md:text-4xl font-serif text-red-600 mb-3">Promotions Exclusives</h2>
+                        <p class="text-gray-600 text-lg mb-8">Inscrivez-vous à notre newsletter pour recevoir -15% sur votre première commande et accéder à nos ventes privées.</p>
+                        <form class="flex flex-col sm:flex-row gap-3">
+                            <input type="email" placeholder="Votre adresse e-mail" class="flex-grow p-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-400 transition">
+                            <button type="submit" class="btn bg-red-500 hover:bg-red-600 text-white">S'inscrire</button>
+                        </form>
+                    </div>
+                    <div class="lg:w-1/2 mt-8 lg:mt-0">
+                        <img src="https://placehold.co/600x400/FECACA/991B1B?text=Offre+Sp%C3%A9ciale" alt="Image promotionnelle" class="rounded-lg shadow-md w-full h-auto">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact-us" class="py-20 md:py-28 bg-gray-50">
+            <div class="container mx-auto px-6 reveal">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl md:text-5xl font-serif">Contactez-nous</h2>
+                    <p class="text-gray-600 mt-3 text-lg">Une question ? Une demande particulière ? N'hésitez pas.</p>
+                </div>
+                <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+                    <form id="contact-form" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="contact-name" class="block text-sm font-medium text-gray-700">Votre Nom</label>
+                                <input type="text" id="contact-name" name="from_name" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-gray-800 focus:border-gray-800 p-3">
+                            </div>
+                            <div>
+                                <label for="contact-email" class="block text-sm font-medium text-gray-700">Votre E-mail</label>
+                                <input type="email" id="contact-email" name="from_email" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-gray-800 focus:border-gray-800 p-3">
+                            </div>
+                        </div>
+                        <div>
+                            <label for="contact-message" class="block text-sm font-medium text-gray-700">Votre Message</label>
+                            <textarea id="contact-message" name="message" rows="5" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-gray-800 focus:border-gray-800 p-3"></textarea>
+                        </div>
+                        <div class="text-center pt-4">
+                            <button type="submit" id="contact-submit-button" class="btn btn-primary w-full md:w-auto flex items-center justify-center">
+                                <span id="contact-button-text">Envoyer le Message</span>
+                                <svg id="contact-button-loader" class="animate-spin ml-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            </button>
+                        </div>
+                    </form>
+                    <p id="contact-feedback" class="text-center font-semibold mt-4 hidden"></p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-900 text-white pt-20 pb-10">
+        <div class="container mx-auto px-6 reveal">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                <div class="md:col-span-2 lg:col-span-1">
+                    <h3 class="text-2xl font-serif mb-4">Wavy</h3>
+                    <p class="text-gray-400 mb-6">La mode comme une vague de style et d'élégance.</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold mb-4">Navigation</h3>
+                    <ul class="space-y-3 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition">Accueil</a></li>
+                        <li><a href="femme.html" class="hover:text-white transition">Collection Femme</a></li>
+                        <li><a href="homme.html" class="hover:text-white transition">Collection Homme</a></li>
+                        <li><a href="#" class="hover:text-white transition">Mentions Légales</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold mb-4">Contact</h3>
+                    <div class="space-y-3 text-gray-400">
+                        <p class="flex items-start"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 mt-1 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg> 123 Rue de la Mode, 75001 Paris</p>
+                        <p><a href="mailto:support@wavy.com" class="hover:text-white transition">support@wavy.com</a></p>
+                        <p><a href="tel:+33123456789" class="hover:text-white transition">+33 1 23 45 67 89</a></p>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold mb-4">Suivez-nous</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" aria-label="Facebook" class="text-gray-400 hover:text-white transition"><svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z" /></svg></a>
+                        <a href="#" aria-label="Instagram" class="text-gray-400 hover:text-white transition"><svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.85s-.011 3.584-.069 4.85c-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.584-.012-4.85-.07c-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.85s.012-3.584.07-4.85c.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.85-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948s.014 3.667.072 4.947c.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072s3.667-.014 4.947-.072c4.358-.2 6.78-2.618 6.98-6.98.059-1.281.073-1.689.073-4.948s-.014-3.667-.072-4.947c-.2-4.358-2.618-6.78-6.98-6.98-1.281-.059-1.689-.073-4.948-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.162 6.162 6.162 6.162-2.759 6.162-6.162-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4s1.791-4 4-4 4 1.79 4 4-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44 1.441-.645 1.441-1.44-.645-1.44-1.441-1.44z" /></svg></a>
+                        <a href="#" aria-label="Twitter" class="text-gray-400 hover:text-white transition"><svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616v.064c0 2.298 1.634 4.215 3.791 4.649-.69.188-1.432.23-2.164.084.618 1.953 2.423 3.374 4.564 3.414-1.714 1.34-3.872 2.145-6.225 2.145-.4 0-.792-.023-1.175-.068 2.226 1.433 4.872 2.27 7.734 2.27 9.284 0 14.376-7.794 14.376-14.376 0-.219-.005-.436-.014-.652.984-.71 1.835-1.595 2.518-2.6z" /></svg></a>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-12">
+                <h3 class="text-xl font-semibold mb-4 text-center">Notre Boutique</h3>
+                <div id="map" class="h-[400px] w-full rounded-lg shadow-lg bg-gray-700 opacity-80"></div>
+            </div>
+            <div class="border-t border-gray-700 pt-8 text-center text-gray-500">
+                <p>&copy; <span id="year"></span> Wavy. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="chatbot-container">
+        <div id="chatbot-window">
+            <div id="chatbot-header">
+                <span>Assistant Wavy</span>
+                <button id="close-chatbot" class="text-white">&times;</button>
+            </div>
+            <div id="chatbot-messages">
+                </div>
+            <div id="chatbot-input-container">
+                <input type="text" id="chatbot-input" placeholder="Posez votre question...">
+                <button id="chatbot-send">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 12h14" /></svg>
+                </button>
+            </div>
+        </div>
+        <button id="chatbot-button" aria-label="Ouvrir le chatbot">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+        </button>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // ========= Logique du Menu Mobile =========
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // ========= Animation au défilement =========
+            const revealElements = document.querySelectorAll('.reveal');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+            revealElements.forEach(el => observer.observe(el));
+
+            // ========= Initialisation de la carte Leaflet =========
+            const mapCoords = [48.8566, 2.3522];
+            const map = L.map('map').setView(mapCoords, 14);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                subdomains: 'abcd',
+                maxZoom: 20
+            }).addTo(map);
+            const icon = L.icon({
+                iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+                shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+                iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+            });
+            L.marker(mapCoords, {icon: icon}).addTo(map)
+                .bindPopup('<b>Boutique Wavy</b><br>123 Rue de la Mode, 75001 Paris.')
+                .openPopup();
+
+            // ========= Mise à jour de l'année dans le pied de page =========
+            document.getElementById('year').textContent = new Date().getFullYear();
+
+            // ========= Logique du Formulaire de Contact =========
+            // N'oubliez pas de remplacer ces valeurs par VOS clés EmailJS
+            const emailjsPublicKey = "YOUR_PUBLIC_KEY";
+            const emailjsServiceID = "YOUR_SERVICE_ID";
+            const emailjsTemplateID = "YOUR_TEMPLATE_ID";
+
+            if (emailjsPublicKey !== "YOUR_PUBLIC_KEY") {
+                emailjs.init({ publicKey: emailjsPublicKey });
+            }
+            const contactForm = document.getElementById('contact-form');
+            const submitButton = document.getElementById('contact-submit-button');
+            const buttonText = document.getElementById('contact-button-text');
+            const buttonLoader = document.getElementById('contact-button-loader');
+            const feedbackMessage = document.getElementById('contact-feedback');
+            contactForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                if (emailjsPublicKey === "YOUR_PUBLIC_KEY" || emailjsServiceID === "YOUR_SERVICE_ID" || emailjsTemplateID === "YOUR_TEMPLATE_ID") {
+                    feedbackMessage.textContent = 'La configuration EmailJS est manquante.';
+                    feedbackMessage.className = 'text-center font-semibold mt-4 text-red-600 block';
+                    return;
+                }
+
+                buttonText.classList.add('hidden');
+                buttonLoader.classList.remove('hidden');
+                submitButton.disabled = true;
+
+                emailjs.sendForm(emailjsServiceID, emailjsTemplateID, this)
+                    .then(() => {
+                        feedbackMessage.textContent = 'Merci ! Votre message a bien été envoyé.';
+                        feedbackMessage.className = 'text-center font-semibold mt-4 text-green-600 block';
+                        contactForm.reset();
+                    }, (error) => {
+                        feedbackMessage.textContent = 'Une erreur est survenue. Veuillez réessayer.';
+                        feedbackMessage.className = 'text-center font-semibold mt-4 text-red-600 block';
+                        console.log('FAILED...', error);
+                    })
+                    .finally(() => {
+                        buttonText.classList.remove('hidden');
+                        buttonLoader.classList.add('hidden');
+                        submitButton.disabled = false;
+                    });
+            });
+
+            // ========= Logique du Chatbot avec API Gemini =========
+            const chatbotButton = document.getElementById('chatbot-button');
+            const chatbotWindow = document.getElementById('chatbot-window');
+            const closeChatbotButton = document.getElementById('close-chatbot');
+            const chatbotMessages = document.getElementById('chatbot-messages');
+            const chatbotInput = document.getElementById('chatbot-input');
+            const chatbotSend = document.getElementById('chatbot-send');
+
+            const faqContext = `
+                INFORMATIONS POUR L'ASSISTANT (FAQ de la boutique Wavy):
+
+                **COMMANDES**
+                - Comment passer une commande ? Pour passer une commande, sélectionnez un article, la taille et la couleur, puis cliquez sur "Ajouter au panier". Ensuite, allez au panier et suivez les étapes de paiement.
+                - Modifier une commande ? Une fois confirmée, une commande ne peut plus être modifiée. Il faut nous contacter très rapidement.
+                - Suivi de commande ? Un e-mail avec un lien de suivi est envoyé après expédition. Le suivi est aussi disponible dans "Mon compte" > "Mes commandes".
+
+                **LIVRAISON**
+                - Délais ? 2 à 5 jours ouvrables.
+                - Frais ? Indiqués au paiement. Gratuite dès 70€ d’achat.
+                - International ? Oui, nous livrons à l'international. Frais et délais variables.
+
+                **RETOURS ET REMBOURSEMENTS**
+                - Politique de retour ? 14 jours après réception. L'article doit être neuf, non porté, avec étiquette.
+                - Comment faire un retour ? Via "Mon compte" > "Mes commandes". Un bordereau sera fourni.
+                - Délai de remboursement ? 5 à 7 jours ouvrables après réception et validation du retour.
+
+                **TAILLES ET STOCK**
+                - Choisir sa taille ? Consulter le guide des tailles sur chaque page produit. En cas de doute, prendre la taille au-dessus.
+                - Disponibilité ? Si un article ne peut pas être ajouté au panier, il est en rupture de stock. Une alerte de disponibilité peut être activée.
+
+                **PAIEMENT**
+                - Moyens de paiement ? Carte bancaire (Visa, Mastercard), PayPal. Klarna selon les pays.
+                - Sécurité ? Oui, les paiements sont sécurisés par protocole SSL.
+
+                **PRODUITS**
+                - Écoresponsabilité ? Certains articles sont durables. Chercher la mention "écoresponsable".
+                - Fabrication ? Ateliers en Europe, Maghreb, Asie, dans des conditions éthiques.
+
+                **COMPTE CLIENT**
+                - Créer un compte ? Cliquer sur l'icône "Mon compte" et remplir le formulaire.
+                - Mot de passe oublié ? Cliquer sur "Mot de passe oublié ?" sur la page de connexion.
+
+                **PROMOTIONS ET FIDÉLITÉ**
+                - Code promo ? À entrer dans le champ dédié au moment du paiement.
+                - Programme de fidélité ? Oui, chaque achat rapporte des points convertibles en réductions.
+
+                **SERVICE CLIENT**
+                - Contact ? Formulaire de contact, email à support@wavy.com, ou téléphone. Lundi-vendredi, 9h-18h.
+                - Boutique physique ? Non, nous sommes 100% en ligne pour le moment.
+            `;
+
+            const systemInstruction = {
+                parts: [{
+                    text: `Tu es un assistant virtuel pour "Wavy", une boutique de vêtements de luxe. Ton ton est élégant, serviable et concis. Ne dis jamais que tu es un modèle de langage ou une IA. Base tes réponses sur la FAQ suivante. Si la question n'est pas dans la FAQ, dis que tu n'as pas l'information et invite à utiliser le formulaire de contact.\n\n${faqContext}`
+                }]
+            };
+
+            // This history is for the API, it now only contains the conversation turns.
+            let chatHistory = [];
+
+            const toggleChatbot = () => chatbotWindow.classList.toggle('open');
+            chatbotButton.addEventListener('click', toggleChatbot);
+            closeChatbotButton.addEventListener('click', toggleChatbot);
+
+            function addMessage(text, sender, isTyping = false) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('chat-message', sender === 'user' ? 'user-message' : 'bot-message');
+
+                if (isTyping) {
+                    messageElement.classList.add('typing');
+                    messageElement.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+                    messageElement.id = 'typing-indicator';
+                } else {
+                    messageElement.textContent = text;
+                }
+
+                chatbotMessages.appendChild(messageElement);
+                chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+            }
+
+            async function handleUserInput() {
+                const userText = chatbotInput.value.trim();
+                if (!userText) return;
+
+                addMessage(userText, 'user');
+                chatbotInput.value = '';
+                addMessage('', 'bot', true);
+
+                chatHistory.push({ role: "user", parts: [{ text: userText }] });
+
+                try {
+                    const payload = {
+                      contents: chatHistory,
+                      systemInstruction: systemInstruction,
+                    };
+                    const apiKey = "";
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const errorBody = await response.json().catch(() => response.text());
+                        console.error("API Error Response:", errorBody);
+                        throw new Error(`API error: ${response.status} ${response.statusText}`);
+                    }
+
+                    const result = await response.json();
+
+                    document.getElementById('typing-indicator')?.remove();
+
+                    if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
+                        const botResponse = result.candidates[0].content.parts[0].text;
+                        addMessage(botResponse, 'bot');
+                        chatHistory.push({ role: "model", parts: [{ text: botResponse }] });
+                    } else {
+                         addMessage("Je suis désolé, je n'ai pas pu générer de réponse. Veuillez réessayer.", 'bot');
+                         chatHistory.pop(); // Remove user message on failure
+                    }
+
+                } catch (error) {
+                    console.error("Gemini API call failed:", error);
+                    document.getElementById('typing-indicator')?.remove();
+                    addMessage("Désolé, une erreur technique est survenue. Veuillez réessayer plus tard.", 'bot');
+                    chatHistory.pop(); // Remove user message on failure
+                }
+            }
+
+            chatbotSend.addEventListener('click', handleUserInput);
+            chatbotInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handleUserInput();
+                }
+            });
+
+            // Display-only welcome message
+            setTimeout(() => {
+               addMessage("Bonjour ! Je suis l'assistant Wavy. Comment puis-je vous aider ?", 'bot');
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

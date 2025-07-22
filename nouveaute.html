@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouveautés - Élégance</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts: Inter & Playfair Display -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+
+    <!-- Leaflet CSS for Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F7F4;
+        }
+        h1, h2, h3, .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in-element {
+            animation: fadeIn 0.8s ease-out forwards;
+            opacity: 0;
+        }
+        .product-image-container {
+            overflow: hidden;
+        }
+        .product-image-container img {
+            transition: transform 0.5s ease;
+        }
+        .product-image-container:hover img {
+            transform: scale(1.05);
+        }
+        /* Styles pour le panier */
+        #cart-panel {
+            transition: transform 0.3s ease-in-out;
+        }
+        #cart-overlay {
+            transition: opacity 0.3s ease-in-out;
+        }
+        .cart-item-remove-btn {
+            transition: color 0.2s ease;
+        }
+        .cart-item-remove-btn:hover {
+            color: #ef4444; /* red-500 */
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- =========== En-tête et Navigation =========== -->
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-2xl font-serif font-bold text-gray-900">Élégance</a>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="nouveaute.html" class="text-gray-900 font-semibold border-b-2 border-gray-800">Nouveautés</a>
+                <a href="femme.html" class="text-gray-600 hover:text-gray-900 transition">Femme</a>
+                <a href="homme.html" class="text-gray-600 hover:text-gray-900 transition">Homme</a>
+                <a href="index.html#promotions" class="text-red-500 font-bold hover:text-red-600 transition">Promotions</a>
+                <a href="#contact" class="text-gray-600 hover:text-gray-900 transition">Contact</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button aria-label="Rechercher"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg></button>
+                <button id="cart-button" aria-label="Panier" class="relative">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                    <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </button>
+                <button id="mobile-menu-button" class="md:hidden" aria-label="Menu"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg></button>
+            </div>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4 space-y-2">
+             <a href="nouveaute.html" class="block text-gray-900 font-semibold">Nouveautés</a>
+             <a href="femme.html" class="block text-gray-600 hover:text-gray-900 transition">Femme</a>
+             <a href="homme.html" class="block text-gray-600 hover:text-gray-900 transition">Homme</a>
+             <a href="index.html#promotions" class="block text-red-500 font-bold hover:text-red-600 transition">Promotions</a>
+             <a href="#contact" class="block text-gray-600 hover:text-gray-900 transition">Contact</a>
+        </div>
+    </header>
+
+    <main class="py-16 md:py-24">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h1 class="text-4xl md:text-5xl font-serif">Nos Nouveautés</h1>
+                <p class="text-gray-600 mt-2">Découvrez les dernières pièces de notre collection.</p>
+            </div>
+
+            <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-12">
+                <!-- Les produits seront injectés ici par JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <!-- =========== Panier (Off-canvas) =========== -->
+    <div id="cart-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden"></div>
+    <div id="cart-panel" class="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-xl z-50 transform translate-x-full">
+        <div class="flex flex-col h-full">
+            <div class="flex justify-between items-center p-6 border-b">
+                <h2 class="text-2xl font-serif">Votre Panier</h2>
+                <button id="close-cart-button" class="text-3xl leading-none p-1 hover:text-red-500 transition-colors" aria-label="Fermer le panier">&times;</button>
+            </div>
+            <div id="cart-items" class="flex-grow p-6 overflow-y-auto">
+                <!-- Les articles du panier seront ici -->
+            </div>
+            <div class="p-6 border-t bg-gray-50">
+                <div class="flex justify-between font-bold text-lg mb-4">
+                    <span>Sous-total</span>
+                    <span id="cart-subtotal">0,00 €</span>
+                </div>
+                <!-- MODIFICATION: Le bouton est maintenant un lien (<a>) avec un ID -->
+                <a href="caisse.html" id="checkout-button" class="block text-center w-full bg-gray-800 text-white py-3 rounded-md hover:bg-gray-900 transition">Passer la commande</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========== Pied de page (Identique à l'accueil) =========== -->
+    <footer id="contact" class="bg-gray-900 text-white pt-16 pb-8">
+        <div class="container mx-auto px-6">
+            <p class="text-center text-gray-500">&copy; <span id="year"></span> Élégance. Tous droits réservés.</p>
+       </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- Données des Produits ---
+            const products = [
+                { id: 1, name: 'Blazer Croisé en Laine', price: 189.00, image: 'https://placehold.co/600x800/B8AFAF/333333?text=Nouveau+Blazer' },
+                { id: 2, name: 'Jupe Midi Plissée', price: 99.00, image: 'https://placehold.co/600x800/D1CFCB/333333?text=Jupe+Midi' },
+                { id: 3, name: 'Jean Droit Brut', price: 115.00, image: 'https://placehold.co/600x800/ADB5BD/333333?text=Jean+Droit' },
+                { id: 4, name: 'Pull Col Roulé Cachemire', price: 250.00, image: 'https://placehold.co/600x800/E9E3E0/333333?text=Pull+Cachemire' },
+                { id: 5, name: 'Derbies Cuir Poli', price: 175.00, image: 'https://placehold.co/600x800/A3A3A3/FFFFFF?text=Derbies+Cuir' },
+                { id: 6, name: 'Trench-coat Classique', price: 220.00, image: 'https://placehold.co/600x800/CBC4C0/FFFFFF?text=Trench-coat' },
+                { id: 7, name: 'Chemise en Soie Lavée', price: 140.00, image: 'https://placehold.co/600x800/DEE2E6/333333?text=Chemise+Soie' },
+                { id: 8, name: 'Sac Bandoulière Cuir', price: 195.00, image: 'https://placehold.co/600x800/BDB2A9/FFFFFF?text=Sac+Bandouli%C3%A8re' },
+                { id: 9, name: 'Robe de Soirée Satinée', price: 210.00, image: 'https://placehold.co/600x800/9A8C98/FFFFFF?text=Robe+Soir%C3%A9e' },
+                { id: 10, name: 'Mocassins en Daim', price: 155.00, image: 'https://placehold.co/600x800/C9ADA7/333333?text=Mocassins' },
+                { id: 11, name: 'Veste Aviateur Cuir', price: 350.00, image: 'https://placehold.co/600x800/4A4E69/FFFFFF?text=Veste+Aviateur' },
+                { id: 12, name: 'Ceinture Cuir Tressé', price: 75.00, image: 'https://placehold.co/600x800/F2E9E4/333333?text=Ceinture+Cuir' }
+            ];
+
+            const productGrid = document.getElementById('product-grid');
+
+            // --- Génération de la Grille de Produits ---
+            if (productGrid) {
+                products.forEach((product, index) => {
+                    const productLink = document.createElement('a');
+                    productLink.href = `produit.html?id=${product.id}`;
+                    productLink.className = 'text-left group fade-in-element';
+                    productLink.style.animationDelay = `${index * 0.05}s`;
+
+                    productLink.innerHTML = `
+                        <div class="product-image-container rounded-lg shadow-md mb-4">
+                            <img src="${product.image}" alt="[Image de ${product.name}]" class="w-full h-auto object-cover rounded-lg">
+                        </div>
+                        <h3 class="font-semibold text-lg">${product.name}</h3>
+                        <p class="text-gray-500">${product.price.toFixed(2)} €</p>
+                    `;
+                    productGrid.appendChild(productLink);
+                });
+            }
+
+            // --- Logique du Panier ---
+            const cartPanel = document.getElementById('cart-panel');
+            const cartOverlay = document.getElementById('cart-overlay');
+            const cartButton = document.getElementById('cart-button');
+            const closeCartButton = document.getElementById('close-cart-button');
+            const cartItemsContainer = document.getElementById('cart-items');
+            const cartCountElement = document.getElementById('cart-count');
+            const cartSubtotalElement = document.getElementById('cart-subtotal');
+            // MODIFICATION: Récupération du bouton "Passer la commande"
+            const checkoutButton = document.getElementById('checkout-button');
+
+
+            const toggleCart = () => {
+                cartPanel.classList.toggle('translate-x-full');
+                cartOverlay.classList.toggle('hidden');
+            };
+
+            cartButton.addEventListener('click', () => {
+                renderCart();
+                toggleCart();
+            });
+            closeCartButton.addEventListener('click', toggleCart);
+            cartOverlay.addEventListener('click', toggleCart);
+
+            function getCart() {
+                return JSON.parse(localStorage.getItem('cart')) || [];
+            }
+
+            function saveCart(cart) {
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartIcon();
+                // Re-render le panier si celui-ci est ouvert
+                if(!cartPanel.classList.contains('translate-x-full')) {
+                    renderCart();
+                }
+            }
+
+            function updateCartIcon() {
+                const cart = getCart();
+                const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+                cartCountElement.textContent = totalItems;
+
+                // MODIFICATION: Logique pour activer/désactiver le bouton de caisse
+                if (checkoutButton) {
+                    if (totalItems === 0) {
+                        checkoutButton.classList.add('opacity-50', 'cursor-not-allowed');
+                        // Empêche le clic si le panier est vide
+                        checkoutButton.onclick = (e) => e.preventDefault();
+                    } else {
+                        checkoutButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                         // Autorise le clic
+                        checkoutButton.onclick = null;
+                    }
+                }
+            }
+
+            function renderCart() {
+                const cart = getCart();
+                cartItemsContainer.innerHTML = '';
+                let subtotal = 0;
+
+                if (cart.length === 0) {
+                    cartItemsContainer.innerHTML = '<p class="text-gray-500 text-center my-4">Votre panier est vide.</p>';
+                } else {
+                    cart.forEach((item, index) => {
+                        const itemElement = document.createElement('div');
+                        itemElement.className = 'flex items-center gap-4 py-4 border-b';
+                        itemElement.innerHTML = `
+                            <img src="${item.image}" alt="${item.name}" class="w-20 h-24 object-cover rounded-md">
+                            <div class="flex-grow">
+                                <h4 class="font-semibold">${item.name}</h4>
+                                <p class="text-sm text-gray-500">Taille: ${item.size}</p>
+                                <p class="text-lg font-semibold">${item.price.toFixed(2)} €</p>
+                            </div>
+                            <div class="text-center">
+                                <p>Qté: ${item.quantity}</p>
+                                <button class="text-xs text-gray-500 hover:text-red-500 cart-item-remove-btn" data-index="${index}">Retirer</button>
+                            </div>
+                        `;
+                        cartItemsContainer.appendChild(itemElement);
+                        subtotal += item.price * item.quantity;
+                    });
+                }
+                cartSubtotalElement.textContent = `${subtotal.toFixed(2)} €`;
+                updateCartIcon(); // Met à jour le bouton de caisse à chaque rendu du panier
+
+                // Ajout des listeners pour les boutons "Retirer"
+                document.querySelectorAll('.cart-item-remove-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const indexToRemove = parseInt(e.target.dataset.index);
+                        let cart = getCart();
+                        cart.splice(indexToRemove, 1);
+                        saveCart(cart);
+                        renderCart(); // Re-render le panier
+                    });
+                });
+            }
+
+            // --- Logique du menu mobile ---
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // --- Initialisation ---
+            document.getElementById('year').textContent = new Date().getFullYear();
+            updateCartIcon(); // Mettre à jour l'icône et le bouton de caisse au chargement de la page
+        });
+    </script>
+</body>
+</html>

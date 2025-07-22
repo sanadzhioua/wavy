@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collection Femme - Wavy</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts: Inter & Playfair Display -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FDFDFB; }
+        h1, h2, h3, .font-serif { font-family: 'Playfair Display', serif; }
+        .product-image-container, .category-card { overflow: hidden; }
+        .product-image-container img, .category-card img { transition: transform 0.5s ease; }
+        .product-image-container:hover img, .category-card:hover img { transform: scale(1.05); }
+        #cart-panel { transition: transform 0.3s ease-in-out; }
+        #cart-overlay { transition: opacity 0.3s ease-in-out; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- =========== En-tête et Navigation =========== -->
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="accueil.html" class="text-3xl font-serif font-bold text-gray-900">Wavy</a>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="nouveaute.html" class="text-gray-600 hover:text-gray-900 transition">Nouveautés</a>
+                <a href="femme.html" class="text-gray-900 font-semibold border-b-2 border-gray-800">Femme</a>
+                <a href="homme.html" class="text-gray-600 hover:text-gray-900 transition">Homme</a>
+                <a href="promotions.html" class="text-red-500 font-bold hover:text-red-600 transition">Promotions</a>
+                <a href="accueil.html#contact-us" class="text-gray-600 hover:text-gray-900 transition">Contact</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button aria-label="Rechercher"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg></button>
+                <button id="cart-button" aria-label="Panier" class="relative">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                    <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </button>
+                <button id="mobile-menu-button" class="md:hidden" aria-label="Menu"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg></button>
+            </div>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4 space-y-2">
+             <a href="nouveaute.html" class="block text-gray-600 hover:text-gray-900 transition">Nouveautés</a>
+             <a href="femme.html" class="block text-gray-900 font-semibold">Femme</a>
+             <a href="homme.html" class="block text-gray-600 hover:text-gray-900 transition">Homme</a>
+             <a href="promotions.html" class="block text-red-500 font-bold hover:text-red-600 transition">Promotions</a>
+             <a href="accueil.html#contact-us" class="block text-gray-600 hover:text-gray-900 transition">Contact</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- =========== Section Héros Femme =========== -->
+        <section class="relative h-[80vh] bg-cover bg-center text-white" style="background-image: url('https://resize.elle.fr/article/var/plain_site/storage/images/mode/les-news-mode/pinkflation-pourquoi-les-prix-des-vetements-pour-femmes-augmentent-ils-4044435/97203694-1-fre-FR/Pinkflation-pourquoi-les-prix-des-vetements-pour-femmes-augmentent-ils.jpg');">
+            <div class="absolute inset-0 bg-black/25"></div>
+            <div class="relative h-full flex flex-col justify-center items-center text-center px-4">
+                <h1 class="text-4xl md:text-6xl font-serif font-bold">Collection Féminine</h1>
+                <p class="text-lg md:text-xl max-w-2xl mt-4">Découvrez des pièces uniques qui subliment votre style.</p>
+            </div>
+        </section>
+
+        <div class="container mx-auto px-6 py-16 md:py-24">
+            <!-- Vue de sélection des catégories -->
+            <div id="category-selection-view">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-serif">Nos Catégories Femme</h2>
+                    <p class="text-gray-600 mt-2">Explorez nos différentes collections pour trouver votre style.</p>
+                </div>
+                <div id="category-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <!-- Les catégories seront injectées ici -->
+                </div>
+            </div>
+
+            <!-- Vue d'affichage des produits (initialement cachée) -->
+            <div id="product-display-view" class="hidden">
+                <div class="flex items-center mb-12">
+                    <button id="back-to-categories-btn" class="text-gray-600 hover:text-gray-900 mr-4 p-2 rounded-full hover:bg-gray-200 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                    </button>
+                    <h2 id="product-view-title" class="text-3xl md:text-4xl font-serif"></h2>
+                </div>
+                <div id="women-product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-12">
+                    <!-- Les produits filtrés seront injectés ici -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- =========== Panier (Off-canvas) =========== -->
+    <div id="cart-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden"></div>
+    <div id="cart-panel" class="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-xl z-50 transform translate-x-full">
+        <div class="flex flex-col h-full">
+            <div class="flex justify-between items-center p-6 border-b">
+                <h2 class="text-2xl font-serif">Votre Panier</h2>
+                <button id="close-cart-button" class="text-3xl leading-none p-1 hover:text-red-500 transition-colors" aria-label="Fermer le panier">&times;</button>
+            </div>
+            <div id="cart-items" class="flex-grow p-6 overflow-y-auto">
+                <p class="text-gray-500">Votre panier est vide.</p>
+            </div>
+            <div class="p-6 border-t bg-gray-50">
+                 <div class="flex justify-between font-bold text-lg mb-4">
+                    <span>Sous-total</span>
+                    <span id="cart-subtotal">0,00 €</span>
+                </div>
+                <a href="caisse.html" id="checkout-button" class="block text-center w-full bg-gray-800 text-white py-3 rounded-md hover:bg-gray-900 transition">Passer la commande</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========== Pied de page (Identique à l'accueil) =========== -->
+    <footer id="contact" class="bg-gray-900 text-white pt-16 pb-8">
+        <div class="container mx-auto px-6">
+            <p class="text-center text-gray-500">&copy; <span id="year"></span> Wavy. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // --- Fonction pour initialiser la base de données de produits ---
+            // Cela garantit que la page produit.html aura accès aux informations de ces articles.
+            function initializeProductDatabase() {
+                // On récupère la base de données existante depuis le localStorage
+                let allProducts = JSON.parse(localStorage.getItem('allProducts')) || {};
+
+                // On définit les produits spécifiques à la page femme
+                const womenProductsToAdd = {
+                    '201': { id: 201, name: 'Robe Bohème Fleurie', price: 89.90, image: 'https://miss-boheme.com/cdn/shop/products/robe-boheme-fleurie-rouge-s-440.jpg?v=1675780374&width=667', category: 'dresses', sizes: ['S', 'M', 'L'] },
+                    '202': { id: 202, name: 'Top en Lin Manches Courtes', price: 45.00, image: 'https://www.na-kd.com/cdn-cgi/image/width=800,quality=80,sharpen=0.3/globalassets/short_sleeve_linen_blend_top_1014-001518-06660426.jpg?ref=6ECE3AE06E', category: 'tops', sizes: ['XS', 'S', 'M'] },
+                    '203': { id: 203, name: 'Short en Jean Taille Haute', price: 59.90, image: 'https://drest.s3.eu-west-3.amazonaws.com/wp-content/uploads/2023/07/07125729/blue-viola-wide-high-waist-denim-shorts.jpeg', category: 'shorts-pants', sizes: ['34', '36', '38', '40'] },
+                    '204': { id: 204, name: 'Combinaison Palme Verte', price: 95.00, image: 'https://www.cotondumonde.com/media/catalog/product/cache/e6271bbc9f05b8b9ccd824faf1b08263/v/a/vaninapalmevert-0.jpg', category: 'dresses', sizes: ['S', 'M', 'L'] },
+                    '205': { id: 205, name: 'Pantacourt Confort', price: 49.90, image: 'https://www.bleu-bonheur.fr/media/catalog/product/cache/1cf62c7e09bfb2dd36a43a996e02ea13/5/5/55317-01.jpg', category: 'shorts-pants', sizes: ['M', 'L', 'XL'] },
+                    '206': { id: 206, name: 'Jean Droit Vintage', price: 79.90, image: 'https://static.reserved.com/media/catalog/product/cache/1200/a4e40ebdc3e371adff845072e1c73f37/2/3/236AO-03X-003-1-764244_3.jpg', category: 'shorts-pants', sizes: ['36', '38', '40'] },
+                    '207': { id: 207, name: 'Haut Basique à Bretelles', price: 25.00, image: 'https://kiabi.tn/cdn/shop/files/CZE10_8_ZC1.jpg?v=1746763835&width=1946', category: 'tops', sizes: ['S', 'M', 'L', 'XL'] },
+                    '208': { id: 208, name: 'Sandales Compensées', price: 69.90, image: 'https://image01.bonprix.ch/assets/429x600/1746663166/25057765-A61SCUeb.webp', category: 'shoes', sizes: ['37', '38', '39', '40'] },
+                    '209': { id: 209, name: 'Sandales Plates à Lanières', price: 55.00, image: 'https://www.eram.fr/media/catalog/product/W/W/WWWERM_10385760114_0.jpg?optimize=medium&bg-color=255,255,255&fit=bounds&height=1560&width=1560&canvas=1560:1560', category: 'shoes', sizes: ['36', '37', '38', '39'] }
+                };
+
+                // On fusionne les produits de cette page avec la base de données globale
+                allProducts = { ...allProducts, ...womenProductsToAdd };
+
+                // On sauvegarde la base de données mise à jour
+                localStorage.setItem('allProducts', JSON.stringify(allProducts));
+
+                // On retourne uniquement les produits de la page femme pour l'affichage
+                return Object.values(womenProductsToAdd);
+            }
+
+            const womenProducts = initializeProductDatabase();
+
+            const womenCategories = [
+                { id: 'dresses', label: 'Robes & Combinaisons', image: 'https://miss-boheme.com/cdn/shop/products/robe-boheme-fleurie-rouge-s-440.jpg?v=1675780374&width=667' },
+                { id: 'tops', label: 'Hauts', image: 'https://www.na-kd.com/cdn-cgi/image/width=800,quality=80,sharpen=0.3/globalassets/short_sleeve_linen_blend_top_1014-001518-06660426.jpg?ref=6ECE3AE06E' },
+                { id: 'shorts-pants', label: 'Pantalons & Shorts', image: 'https://drest.s3.eu-west-3.amazonaws.com/wp-content/uploads/2023/07/07125729/blue-viola-wide-high-waist-denim-shorts.jpeg' },
+                { id: 'shoes', label: 'Chaussures', image: 'https://image01.bonprix.ch/assets/429x600/1746663166/25057765-A61SCUeb.webp' }
+            ];
+
+            const categorySelectionView = document.getElementById('category-selection-view');
+            const productDisplayView = document.getElementById('product-display-view');
+            const categoryGrid = document.getElementById('category-grid');
+            const productGrid = document.getElementById('women-product-grid');
+            const productViewTitle = document.getElementById('product-view-title');
+            const backToCategoriesBtn = document.getElementById('back-to-categories-btn');
+
+            function renderProducts(productsToRender) {
+                productGrid.innerHTML = '';
+                productsToRender.forEach((product, index) => {
+                    const productLink = document.createElement('a');
+                    productLink.href = `produit.html?id=${product.id}`;
+                    productLink.className = 'text-left group animate-fade-in-up';
+                    productLink.style.animationDelay = `${index * 50}ms`;
+
+                    productLink.innerHTML = `
+                        <div class="product-image-container rounded-lg shadow-md mb-4 bg-gray-200 overflow-hidden aspect-[4/5]">
+                            <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover">
+                        </div>
+                        <h3 class="font-semibold text-lg truncate">${product.name}</h3>
+                        <p class="text-gray-500">${product.price.toFixed(2)} €</p>
+                    `;
+                    productGrid.appendChild(productLink);
+                });
+            }
+
+            function renderCategories() {
+                categoryGrid.innerHTML = '';
+                womenCategories.forEach(cat => {
+                    const categoryCard = document.createElement('div');
+                    categoryCard.className = 'category-card relative rounded-lg shadow-lg cursor-pointer h-64 animate-fade-in-up';
+                    categoryCard.dataset.category = cat.id;
+                    categoryCard.dataset.label = cat.label;
+
+                    categoryCard.innerHTML = `
+                        <img src="${cat.image}" alt="${cat.label}" class="w-full h-full object-cover rounded-lg">
+                        <div class="absolute inset-0 bg-black/40 rounded-lg"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <h2 class="text-white text-4xl font-serif font-bold text-center px-4">${cat.label}</h2>
+                        </div>
+                    `;
+                    categoryGrid.appendChild(categoryCard);
+                });
+            }
+
+            function showProductView(category, label) {
+                const filteredProducts = womenProducts.filter(p => p.category === category);
+                renderProducts(filteredProducts);
+                productViewTitle.textContent = label;
+
+                categorySelectionView.classList.add('hidden');
+                productDisplayView.classList.remove('hidden');
+                window.scrollTo(0, 0);
+            }
+
+            function showCategoryView() {
+                productDisplayView.classList.add('hidden');
+                categorySelectionView.classList.remove('hidden');
+            }
+
+            categoryGrid.addEventListener('click', function(e) {
+                const card = e.target.closest('.category-card');
+                if (card) {
+                    const category = card.dataset.category;
+                    const label = card.dataset.label;
+                    showProductView(category, label);
+                }
+            });
+
+            backToCategoriesBtn.addEventListener('click', showCategoryView);
+            renderCategories();
+
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            document.getElementById('year').textContent = new Date().getFullYear();
+
+            // --- Logique du Panier (partagée) ---
+            const cartPanel = document.getElementById('cart-panel');
+            const cartOverlay = document.getElementById('cart-overlay');
+            const cartButton = document.getElementById('cart-button');
+            const closeCartButton = document.getElementById('close-cart-button');
+            const cartItemsContainer = document.getElementById('cart-items');
+            const cartCountElement = document.getElementById('cart-count');
+            const cartSubtotalElement = document.getElementById('cart-subtotal');
+            const checkoutButton = document.getElementById('checkout-button');
+
+            const toggleCart = () => {
+                cartPanel.classList.toggle('translate-x-full');
+                cartOverlay.classList.toggle('hidden');
+            };
+
+            cartButton.addEventListener('click', () => {
+                renderCart();
+                toggleCart();
+            });
+            closeCartButton.addEventListener('click', toggleCart);
+            cartOverlay.addEventListener('click', toggleCart);
+
+            function getCart() { return JSON.parse(localStorage.getItem('cart')) || []; }
+            function saveCart(cart) {
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartIcon();
+            }
+            function updateCartIcon() {
+                const totalItems = getCart().reduce((sum, item) => sum + item.quantity, 0);
+                cartCountElement.textContent = totalItems;
+                if (checkoutButton) {
+                    if (totalItems === 0) {
+                        checkoutButton.classList.add('opacity-50', 'cursor-not-allowed');
+                        checkoutButton.onclick = (e) => e.preventDefault();
+                    } else {
+                        checkoutButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                        checkoutButton.onclick = null;
+                    }
+                }
+            }
+            function renderCart() {
+                const cart = getCart();
+                cartItemsContainer.innerHTML = '';
+                let subtotal = 0;
+
+                if (cart.length === 0) {
+                    cartItemsContainer.innerHTML = '<p class="text-gray-500 text-center my-4">Votre panier est vide.</p>';
+                } else {
+                    cart.forEach((item, index) => {
+                        const itemElement = document.createElement('div');
+                        itemElement.className = 'flex items-center gap-4 py-4 border-b';
+                        const displayPrice = item.salePrice || item.price;
+                        itemElement.innerHTML = `
+                            <img src="${item.image}" alt="${item.name}" class="w-20 h-24 object-cover rounded-md">
+                            <div class="flex-grow">
+                                <h4 class="font-semibold">${item.name}</h4>
+                                <p class="text-sm text-gray-500">Taille: ${item.size}</p>
+                                <p class="text-lg font-semibold">${(displayPrice * item.quantity).toFixed(2)} €</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="font-semibold">x ${item.quantity}</p>
+                                <button class="text-xs text-gray-500 hover:text-red-500 transition cart-item-remove-btn" data-index="${index}">Supprimer</button>
+                            </div>
+                        `;
+                        cartItemsContainer.appendChild(itemElement);
+                        subtotal += displayPrice * item.quantity;
+                    });
+                }
+                cartSubtotalElement.textContent = `${subtotal.toFixed(2)} €`;
+                updateCartIcon();
+
+                document.querySelectorAll('.cart-item-remove-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const indexToRemove = parseInt(e.target.dataset.index);
+                        let cart = getCart();
+                        cart.splice(indexToRemove, 1);
+                        saveCart(cart);
+                        renderCart();
+                    });
+                });
+            }
+            updateCartIcon();
+        });
+    </script>
+</body>
+</html>

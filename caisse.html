@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caisse - Élégance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+
+    <!-- Script EmailJS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F8F7F4; }
+        h1, h2, h3, .font-serif { font-family: 'Playfair Display', serif; }
+        .error-banner {
+            display: none;
+            background-color: #fef2f2;
+            color: #b91c1c;
+            padding: 1rem;
+            border-left: 4px solid #ef4444;
+            margin-bottom: 1.5rem;
+            border-radius: 0.5rem;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-2xl font-serif font-bold text-gray-900">Élégance</a>
+        </nav>
+    </header>
+
+    <main class="py-12 md:py-20">
+        <div class="container mx-auto px-6">
+            <!-- Bannière d'erreur -->
+            <div id="error-banner" class="error-banner">
+                <p class="font-bold">Erreur de Configuration</p>
+                <p id="error-message"></p>
+            </div>
+
+            <h1 class="text-3xl md:text-4xl font-serif text-center mb-10">Finaliser la Commande</h1>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <!-- Formulaire de Coordonnées -->
+                <div class="bg-white p-8 rounded-lg shadow-md">
+                    <h2 class="text-2xl font-serif mb-6">Vos Coordonnées</h2>
+                    <form id="checkout-form" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="firstname" class="block text-sm font-medium text-gray-700">Prénom</label>
+                                <input type="text" id="firstname" name="firstname" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500">
+                            </div>
+                            <div>
+                                <label for="lastname" class="block text-sm font-medium text-gray-700">Nom</label>
+                                <input type="text" id="lastname" name="lastname" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500">
+                            </div>
+                        </div>
+                        <div>
+                            <label for="address" class="block text-sm font-medium text-gray-700">Adresse Complète</label>
+                            <input type="text" id="address" name="address" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500">
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700">Adresse e-mail</label>
+                            <input type="email" id="email" name="email" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500">
+                        </div>
+                        <div>
+                            <label for="phone" class="block text-sm font-medium text-gray-700">Numéro de téléphone</label>
+                            <input type="tel" id="phone" name="phone" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500">
+                        </div>
+                         <div>
+                            <label for="whatsapp" class="block text-sm font-medium text-gray-700">Numéro WhatsApp (Optionnel)</label>
+                            <input type="tel" id="whatsapp" name="whatsapp" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-gray-500 focus:border-gray-500">
+                        </div>
+                        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md mt-6" role="alert">
+                           <p class="font-bold">Paiement à la livraison</p>
+                           <p>Vous paierez votre commande en espèces au moment de la livraison.</p>
+                        </div>
+                        <div class="pt-6">
+                            <button type="submit" id="submit-button" class="w-full bg-gray-800 text-white py-3 rounded-md text-lg font-semibold hover:bg-gray-900 transition flex items-center justify-center disabled:opacity-50">
+                                <span id="button-text">Valider la Commande</span>
+                                <svg id="button-loader" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Résumé de la commande -->
+                <div class="bg-white p-8 rounded-lg shadow-md">
+                    <h2 class="text-2xl font-serif mb-6">Résumé de la Commande</h2>
+                    <div id="order-summary" class="space-y-4">
+                        <!-- Les articles du panier seront injectés ici par le script -->
+                    </div>
+                    <div class="mt-6 pt-6 border-t space-y-2">
+                        <div class="flex justify-between text-gray-700"><span>Sous-total (HT)</span><span id="summary-subtotal">0,00 €</span></div>
+                        <div class="flex justify-between text-gray-700"><span>TVA (19%)</span><span id="summary-tax">0,00 €</span></div>
+                        <div class="flex justify-between font-bold text-lg"><span>Total (TTC)</span><span id="summary-total">0,00 €</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Importation des modules Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // Votre configuration Firebase (déjà remplie)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCvVBmyYrHRZXbxYr6Zx1T1yj9pht0Pwak",
+            authDomain: "boutique-elegance-1064f.firebaseapp.com",
+            projectId: "boutique-elegance-1064f",
+            storageBucket: "boutique-elegance-1064f.firebasestorage.app",
+            messagingSenderId: "823763968632",
+            appId: "1:823763968632:web:d44cfd9b0ca1c10d08c38d",
+            measurementId: "G-9ZC2BW8W0L"
+        };
+
+        // --- Fonction principale asynchrone pour gérer la logique ---
+        async function main() {
+            let db, auth;
+
+            // Initialisation de Firebase
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                await signInAnonymously(auth);
+                console.log("Connexion à Firebase réussie.");
+            } catch (e) {
+                console.error("Erreur d'initialisation de Firebase:", e);
+                const errorBanner = document.getElementById('error-banner');
+                const errorMessage = document.getElementById('error-message');
+                errorMessage.textContent = "Impossible de se connecter à la base de données. Vérifiez que l'authentification anonyme est bien activée dans votre console Firebase. Détail: " + e.message;
+                errorBanner.style.display = 'block';
+                return; // Arrêter l'exécution en cas d'erreur critique
+            }
+
+            // --- Logique d'affichage et de formulaire ---
+
+            emailjs.init({ publicKey: "k8cZfBLQ8CO0A2BSK" });
+
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            if (cart.length === 0 && !window.location.href.includes('facture.html')) {
+                window.location.href = 'nouveaute.html';
+                return;
+            }
+
+            const orderSummaryContainer = document.getElementById('order-summary');
+            const subtotalElement = document.getElementById('summary-subtotal');
+            const taxElement = document.getElementById('summary-tax');
+            const totalElement = document.getElementById('summary-total');
+            const form = document.getElementById('checkout-form');
+            const submitButton = document.getElementById('submit-button');
+            const buttonText = document.getElementById('button-text');
+            const buttonLoader = document.getElementById('button-loader');
+            const TVA_RATE = 0.19;
+
+            let subtotal = 0;
+            let orderDetailsForEmail = '';
+
+            orderSummaryContainer.innerHTML = '';
+
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                const itemElement = document.createElement('div');
+                itemElement.className = 'flex justify-between items-center';
+                itemElement.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <img src="${item.image}" alt="${item.name}" class="w-16 h-20 object-cover rounded-md">
+                        <div>
+                            <p class="font-semibold">${item.name}</p>
+                            <p class="text-sm text-gray-500">Taille: ${item.size} x ${item.quantity}</p>
+                        </div>
+                    </div>
+                    <p class="font-semibold">${itemTotal.toFixed(2)} €</p>
+                `;
+                orderSummaryContainer.appendChild(itemElement);
+                subtotal += itemTotal;
+                orderDetailsForEmail += `- ${item.name} (Taille: ${item.size}) x ${item.quantity} = ${itemTotal.toFixed(2)} €\n`;
+            });
+
+            const tax = subtotal * TVA_RATE;
+            const total = subtotal + tax;
+
+            subtotalElement.textContent = `${subtotal.toFixed(2)} €`;
+            taxElement.textContent = `${tax.toFixed(2)} €`;
+            totalElement.textContent = `${total.toFixed(2)} €`;
+
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                if (!auth || !auth.currentUser) {
+                    alert("Erreur d'authentification. Veuillez rafraîchir la page et réessayer.");
+                    return;
+                }
+
+                toggleButtonLoading(true);
+
+                const formData = new FormData(form);
+                const customerDetails = Object.fromEntries(formData.entries());
+                const orderNumber = `ELEG-${Date.now()}`;
+
+                const orderData = {
+                    orderNumber: orderNumber,
+                    customer: customerDetails,
+                    items: cart,
+                    subtotal: parseFloat(subtotal.toFixed(2)),
+                    tax: parseFloat(tax.toFixed(2)),
+                    total: parseFloat(total.toFixed(2)),
+                    status: 'Nouvelle',
+                    createdAt: serverTimestamp(),
+                    paymentMethod: 'Paiement à la livraison'
+                };
+
+                try {
+                    const docRef = await addDoc(collection(db, "orders"), orderData);
+                    console.log("Commande enregistrée avec l'ID: ", docRef.id);
+
+                    const templateParams = {
+                        order_number: orderNumber,
+                        customer_name: `${customerDetails.firstname} ${customerDetails.lastname}`,
+                        customer_email: customerDetails.email,
+                        customer_address: customerDetails.address,
+                        customer_phone: customerDetails.phone,
+                        customer_whatsapp: customerDetails.whatsapp || 'Non fourni',
+                        order_details: orderDetailsForEmail,
+                        subtotal: subtotal.toFixed(2),
+                        tax: tax.toFixed(2),
+                        total: total.toFixed(2)
+                    };
+                    await emailjs.send('service_fsg7oka', 'template_rrusqvi', templateParams);
+
+                    localStorage.setItem('finalOrder', JSON.stringify({
+                        ...orderData,
+                        orderDate: new Date().toLocaleDateString('fr-FR')
+                    }));
+                    window.location.href = 'facture.html';
+
+                } catch (error) {
+                    console.error("Échec du processus de commande: ", error);
+                    alert("Une erreur est survenue lors de l'enregistrement de la commande. Veuillez réessayer. Erreur: " + error.message);
+                    toggleButtonLoading(false);
+                }
+            });
+
+            function toggleButtonLoading(isLoading) {
+                buttonText.classList.toggle('hidden', isLoading);
+                buttonLoader.classList.toggle('hidden', !isLoading);
+                submitButton.disabled = isLoading;
+            }
+        }
+
+        // Lancer la fonction principale
+        main();
+    </script>
+</body>
+</html>

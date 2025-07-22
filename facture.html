@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmation de Commande - Élégance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F8F7F4; }
+        h1, h2, h3, .font-serif { font-family: 'Playfair Display', serif; }
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #invoice-section, #invoice-section * {
+                visibility: visible;
+            }
+            #invoice-section {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+    <main class="py-12 md:py-20">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto text-center">
+                 <div class="no-print">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h1 class="text-3xl md:text-4xl font-serif mt-4">Merci pour votre commande !</h1>
+                    <p class="text-gray-600 mt-2">Votre commande a été passée avec succès. Une notification a été envoyée au vendeur.</p>
+                </div>
+                <!-- Section de la Facture -->
+                <div id="invoice-section" class="mt-10 bg-white p-8 rounded-lg shadow-lg text-left">
+                    <div class="flex justify-between items-start mb-8">
+                        <div>
+                            <h2 class="text-3xl font-serif text-gray-900">Facture</h2>
+                            <p class="text-gray-500">Boutique Élégance</p>
+                        </div>
+                        <div class="text-right">
+                            <p id="order-number" class="font-semibold"></p>
+                            <p id="order-date" class="text-sm text-gray-500"></p>
+                        </div>
+                    </div>
+                    <div class="border-t border-b py-4 mb-8">
+                        <h3 class="text-lg font-semibold">Client :</h3>
+                        <p id="customer-name" class="font-medium"></p>
+                        <p id="customer-address"></p>
+                        <p id="customer-email"></p>
+                        <p id="customer-phone"></p>
+                    </div>
+                    <table class="w-full mb-8">
+                        <thead>
+                            <tr class="border-b">
+                                <th class="text-left font-semibold py-2">Produit</th>
+                                <th class="text-center font-semibold py-2">Quantité</th>
+                                <th class="text-right font-semibold py-2">Prix</th>
+                            </tr>
+                        </thead>
+                        <tbody id="invoice-items">
+                            <!-- Les articles seront injectés ici -->
+                        </tbody>
+                    </table>
+                    <div class="w-full md:w-1/2 ml-auto text-right space-y-2">
+                        <div class="flex justify-between"><span class="text-gray-600">Sous-total (HT) :</span><span id="invoice-subtotal"></span></div>
+                        <div class="flex justify-between"><span class="text-gray-600">TVA (19%) :</span><span id="invoice-tax"></span></div>
+                        <div class="flex justify-between font-bold text-xl"><span class="text-gray-900">Total (TTC) :</span><span id="invoice-total"></span></div>
+                    </div>
+                </div>
+                <div class="mt-8 flex justify-center gap-4 no-print">
+                    <button id="print-button" class="bg-gray-800 text-white px-8 py-3 rounded-md hover:bg-gray-900 transition">Imprimer la facture</button>
+                    <a href="index.html" class="bg-white border border-gray-300 text-gray-800 px-8 py-3 rounded-md hover:bg-gray-100 transition">Retour à l'accueil</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const order = JSON.parse(localStorage.getItem('finalOrder'));
+
+            if (!order) {
+                document.querySelector('main .container').innerHTML = '<h1 class="text-2xl text-center">Aucune commande trouvée.</h1>';
+                return;
+            }
+
+            // Remplir les détails de la facture
+            document.getElementById('order-number').textContent = `Commande #${order.orderNumber}`;
+            document.getElementById('order-date').textContent = `Date : ${order.orderDate}`;
+            document.getElementById('customer-name').textContent = `${order.customer.firstname} ${order.customer.lastname}`;
+            document.getElementById('customer-address').textContent = order.customer.address;
+            document.getElementById('customer-email').textContent = order.customer.email;
+            document.getElementById('customer-phone').textContent = order.customer.phone;
+
+            const itemsContainer = document.getElementById('invoice-items');
+            order.items.forEach(item => {
+                const row = document.createElement('tr');
+                row.className = 'border-b';
+                row.innerHTML = `
+                    <td class="py-2">${item.name} <span class="text-sm text-gray-500">(Taille: ${item.size})</span></td>
+                    <td class="text-center py-2">${item.quantity}</td>
+                    <td class="text-right py-2">${(item.price * item.quantity).toFixed(2)} €</td>
+                `;
+                itemsContainer.appendChild(row);
+            });
+
+            document.getElementById('invoice-subtotal').textContent = `${order.subtotal} €`;
+            document.getElementById('invoice-tax').textContent = `${order.tax} €`;
+            document.getElementById('invoice-total').textContent = `${order.total} €`;
+
+            // Bouton d'impression
+            document.getElementById('print-button').addEventListener('click', () => {
+                window.print();
+            });
+
+            // Vider le panier et la commande après affichage de la facture
+            localStorage.removeItem('cart');
+            localStorage.removeItem('finalOrder');
+        });
+    </script>
+</body>
+</html>

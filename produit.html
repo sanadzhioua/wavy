@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détail du Produit - Wavy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FDFDFB; }
+        h1, h2, h3, .font-serif { font-family: 'Playfair Display', serif; }
+        .size-option input:checked + label {
+            border-color: #1f2937; /* gray-800 */
+            background-color: #1f2937;
+            color: white;
+        }
+        #cart-panel {
+            transition: transform 0.3s ease-in-out;
+        }
+        #cart-overlay {
+            transition: opacity 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+    <!-- =========== En-tête (Similaire aux autres pages) =========== -->
+     <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="accueil.html" class="text-3xl font-serif font-bold text-gray-900">Wavy</a>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="nouveaute.html" class="text-gray-600 hover:text-gray-900 transition">Nouveautés</a>
+                <a href="femme.html" class="text-gray-600 hover:text-gray-900 transition">Femme</a>
+                <a href="homme.html" class="text-gray-600 hover:text-gray-900 transition">Homme</a>
+                <a href="promotions.html" class="text-red-500 font-bold hover:text-red-600 transition">Promotions</a>
+                <a href="accueil.html#contact-us" class="text-gray-600 hover:text-gray-900 transition">Contact</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                 <button id="cart-button" aria-label="Panier" class="relative">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                    <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="py-12 md:py-20">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+                <!-- Image du produit -->
+                <div>
+                    <img id="product-image" src="https://placehold.co/800x1000/cccccc/ffffff?text=Chargement..." alt="Image du produit" class="w-full h-auto object-cover rounded-lg shadow-lg">
+                </div>
+                <!-- Détails du produit -->
+                <div class="space-y-6">
+                    <h1 id="product-name" class="text-3xl md:text-4xl font-serif">Nom du Produit</h1>
+                    <div id="price-container">
+                        <p id="product-price" class="text-3xl text-gray-900">0,00 €</p>
+                    </div>
+                    <p class="text-gray-600 leading-relaxed">Ceci est une description élégante et détaillée du produit. Il met en valeur les matériaux de haute qualité, la coupe experte et le style intemporel de la pièce.</p>
+
+                    <!-- Sélection de la taille -->
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">Taille</h3>
+                        <div id="size-options" class="flex flex-wrap gap-3">
+                            <!-- Les options de taille seront ici -->
+                        </div>
+                         <p id="size-error" class="text-red-500 text-sm mt-2 hidden">Veuillez sélectionner une taille.</p>
+                    </div>
+
+                    <!-- Bouton Ajouter au panier -->
+                    <button id="add-to-cart-button" class="w-full bg-gray-800 text-white py-4 rounded-md text-lg font-semibold hover:bg-gray-900 transition">Ajouter au Panier</button>
+                     <p id="add-to-cart-feedback" class="text-green-600 text-center font-semibold mt-2 hidden">Ajouté au panier !</p>
+
+                    <!-- Infos de livraison -->
+                    <div class="border-t pt-6 space-y-3 text-sm text-gray-600">
+                        <p class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                            Date de livraison estimée : <span id="delivery-date" class="font-semibold ml-1"></span></p>
+                        <p class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            Retour gratuit sous 30 jours.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Panier (identique aux autres pages) -->
+    <div id="cart-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden"></div>
+    <div id="cart-panel" class="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-xl z-50 transform translate-x-full">
+         <div class="flex flex-col h-full">
+            <div class="flex justify-between items-center p-6 border-b">
+                <h2 class="text-2xl font-serif">Votre Panier</h2>
+                <button id="close-cart-button" class="text-3xl leading-none p-1 hover:text-red-500 transition-colors" aria-label="Fermer le panier">&times;</button>
+            </div>
+            <div id="cart-items" class="flex-grow p-6 overflow-y-auto">
+                <!-- Les articles du panier seront ici -->
+            </div>
+            <div class="p-6 border-t bg-gray-50">
+                <div class="flex justify-between font-bold text-lg mb-4">
+                    <span>Sous-total</span>
+                    <span id="cart-subtotal">0,00 €</span>
+                </div>
+                <a href="caisse.html" id="checkout-button" class="block text-center w-full bg-gray-800 text-white py-3 rounded-md hover:bg-gray-900 transition">Passer la commande</a>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- Logique pour récupérer et afficher le produit ---
+
+            // On charge la base de données globale depuis le localStorage
+            const allProducts = JSON.parse(localStorage.getItem('allProducts')) || {};
+
+            const params = new URLSearchParams(window.location.search);
+            const productId = params.get('id');
+            const product = allProducts[productId];
+
+            if (product) {
+                // Remplir les informations du produit
+                document.getElementById('product-name').textContent = product.name;
+                document.getElementById('product-image').src = product.image;
+                document.getElementById('product-image').alt = `[Image de ${product.name}]`;
+
+                // Gérer l'affichage du prix (promotionnel ou normal)
+                const priceContainer = document.getElementById('price-container');
+                if (product.salePrice) {
+                    priceContainer.innerHTML = `
+                        <p id="product-price" class="text-3xl text-red-500 font-bold">${product.salePrice.toFixed(2)} €</p>
+                        <p class="text-xl text-gray-500 line-through">${product.price.toFixed(2)} €</p>
+                    `;
+                } else {
+                    priceContainer.innerHTML = `<p id="product-price" class="text-3xl text-gray-900">${product.price.toFixed(2)} €</p>`;
+                }
+
+                // Générer les options de taille
+                const sizeOptionsContainer = document.getElementById('size-options');
+                product.sizes.forEach((size) => {
+                    const optionId = `size-${size}`;
+                    sizeOptionsContainer.innerHTML += `
+                        <div class="size-option">
+                            <input type="radio" name="size" id="${optionId}" value="${size}" class="sr-only">
+                            <label for="${optionId}" class="block cursor-pointer px-4 py-2 border rounded-md transition">${size}</label>
+                        </div>
+                    `;
+                });
+
+                // Calcul de la date de livraison
+                const deliveryDate = new Date();
+                deliveryDate.setDate(deliveryDate.getDate() + 5);
+                document.getElementById('delivery-date').textContent = deliveryDate.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+
+                // Logique d'ajout au panier
+                document.getElementById('add-to-cart-button').addEventListener('click', () => {
+                    const selectedSize = document.querySelector('input[name="size"]:checked');
+                    const sizeError = document.getElementById('size-error');
+                    const feedback = document.getElementById('add-to-cart-feedback');
+
+                    if (!selectedSize) {
+                        sizeError.classList.remove('hidden');
+                        return;
+                    }
+                    sizeError.classList.add('hidden');
+
+                    const itemToAdd = {
+                        id: product.id,
+                        name: product.name,
+                        price: product.price,
+                        salePrice: product.salePrice, // On ajoute le prix promo s'il existe
+                        image: product.image.replace(/(\d{3,4}x\d{3,4})/, '600x800'),
+                        size: selectedSize.value,
+                        quantity: 1
+                    };
+
+                    let cart = getCart();
+                    const existingItemIndex = cart.findIndex(item => item.id == itemToAdd.id && item.size === itemToAdd.size);
+
+                    if (existingItemIndex > -1) {
+                        cart[existingItemIndex].quantity++;
+                    } else {
+                        cart.push(itemToAdd);
+                    }
+
+                    saveCart(cart);
+
+                    feedback.classList.remove('hidden');
+                    setTimeout(() => { feedback.classList.add('hidden'); }, 2000);
+                });
+
+            } else {
+                document.querySelector('main .container').innerHTML = '<h1 class="text-2xl text-center">Produit non trouvé.</h1><p class="text-center mt-4"><a href="accueil.html" class="text-blue-600 hover:underline">Retour à l\'accueil</a></p>';
+            }
+
+            // --- Logique complète du Panier ---
+            const cartPanel = document.getElementById('cart-panel');
+            const cartOverlay = document.getElementById('cart-overlay');
+            const cartButton = document.getElementById('cart-button');
+            const closeCartButton = document.getElementById('close-cart-button');
+            const cartItemsContainer = document.getElementById('cart-items');
+            const cartCountElement = document.getElementById('cart-count');
+            const cartSubtotalElement = document.getElementById('cart-subtotal');
+            const checkoutButton = document.getElementById('checkout-button');
+
+            const toggleCart = () => {
+                cartPanel.classList.toggle('translate-x-full');
+                cartOverlay.classList.toggle('hidden');
+            };
+
+            cartButton.addEventListener('click', () => {
+                renderCart();
+                toggleCart();
+            });
+            closeCartButton.addEventListener('click', toggleCart);
+            cartOverlay.addEventListener('click', toggleCart);
+
+            function getCart() { return JSON.parse(localStorage.getItem('cart')) || []; }
+
+            function saveCart(cart) {
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartIcon();
+                 if(!cartPanel.classList.contains('translate-x-full')) {
+                    renderCart();
+                }
+            }
+
+            function updateCartIcon() {
+                const cart = getCart();
+                const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+                cartCountElement.textContent = totalItems;
+
+                if (checkoutButton) {
+                    if (totalItems === 0) {
+                        checkoutButton.classList.add('opacity-50', 'cursor-not-allowed');
+                        checkoutButton.onclick = (e) => e.preventDefault();
+                    } else {
+                        checkoutButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                        checkoutButton.onclick = null;
+                    }
+                }
+            }
+
+            function renderCart() {
+                const cart = getCart();
+                cartItemsContainer.innerHTML = '';
+                let subtotal = 0;
+
+                if (cart.length === 0) {
+                    cartItemsContainer.innerHTML = '<p class="text-gray-500 text-center my-4">Votre panier est vide.</p>';
+                } else {
+                    cart.forEach((item, index) => {
+                        const itemElement = document.createElement('div');
+                        itemElement.className = 'flex items-center gap-4 py-4 border-b';
+                        const displayPrice = item.salePrice || item.price; // Utilise le prix promo si disponible
+                        itemElement.innerHTML = `
+                            <img src="${item.image}" alt="${item.name}" class="w-20 h-24 object-cover rounded-md">
+                            <div class="flex-grow">
+                                <h4 class="font-semibold">${item.name}</h4>
+                                <p class="text-sm text-gray-500">Taille: ${item.size}</p>
+                                <p class="text-lg font-semibold">${(displayPrice * item.quantity).toFixed(2)} €</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="font-semibold">x ${item.quantity}</p>
+                                <button class="text-xs text-gray-500 hover:text-red-500 transition cart-item-remove-btn" data-index="${index}">Supprimer</button>
+                            </div>
+                        `;
+                        cartItemsContainer.appendChild(itemElement);
+                        subtotal += displayPrice * item.quantity;
+                    });
+                }
+                cartSubtotalElement.textContent = `${subtotal.toFixed(2)} €`;
+                updateCartIcon();
+
+                document.querySelectorAll('.cart-item-remove-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const indexToRemove = parseInt(e.target.dataset.index);
+                        let cart = getCart();
+                        cart.splice(indexToRemove, 1);
+                        saveCart(cart);
+                        renderCart();
+                    });
+                });
+            }
+
+            updateCartIcon();
+        });
+    </script>
+</body>
+</html>
